@@ -16,11 +16,11 @@
     along with Erebot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-class   ErebotModule_MiniSed
-extends ErebotModuleBase
+class   Erebot_Module_MiniSed
+extends Erebot_Module_Base
 {
     static protected $_metadata = array(
-        'requires'  =>  array('TriggerRegistry'),
+        'requires'  =>  array('Erebot_Module_TriggerRegistry'),
     );
     protected $_handler;
     protected $_rawHandler;
@@ -31,30 +31,34 @@ extends ErebotModuleBase
     public function reload($flags)
     {
         if (!($flags & self::RELOAD_INIT)) {
-            $registry   =&  $this->_connection->getModule('TriggerRegistry',
-                                ErebotConnection::MODULE_BY_NAME);
-            $matchAny   =   ErebotUtils::getVStatic($registry, 'MATCH_ANY');
+            $registry   =&  $this->_connection->getModule(
+                'Erebot_Module_TriggerRegistry',
+                Erebot_Connection::MODULE_BY_NAME
+            );
+            $matchAny   =   Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
 
             $this->_connection->removeEventHandler($this->_handler);
             $this->_connection->removeEventHandler($this->_rawHandler);
         }
 
         if ($flags & self::RELOAD_HANDLERS) {
-            $registry   =&  $this->_connection->getModule('TriggerRegistry',
-                                ErebotConnection::MODULE_BY_NAME);
-            $matchAny   =   ErebotUtils::getVStatic($registry, 'MATCH_ANY');
+            $registry   =&  $this->_connection->getModule(
+                'Erebot_Module_TriggerRegistry',
+                Erebot_Connection::MODULE_BY_NAME
+            );
+            $matchAny   =   Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
 
-            $filter         = new ErebotTextFilter($this->_mainCfg);
-            $filter->addPattern(ErebotTextFilter::TYPE_REGEXP, self::REPLACE_PATTERN, FALSE);
-            $this->_handler = new ErebotEventHandler(
+            $filter         = new Erebot_TextFilter($this->_mainCfg);
+            $filter->addPattern(Erebot_TextFilter::TYPE_REGEXP, self::REPLACE_PATTERN, FALSE);
+            $this->_handler = new Erebot_EventHandler(
                                     array($this, 'handleSed'),
-                                    'ErebotEventTextChan',
+                                    'Erebot_Event_ChanText',
                                     NULL, $filter);
             $this->_connection->addEventHandler($this->_handler);
 
-            $this->_rawHandler  = new ErebotEventHandler(
+            $this->_rawHandler  = new Erebot_EventHandler(
                                         array($this, 'handleRawText'),
-                                        'ErebotEventTextChan',
+                                        'Erebot_Event_ChanText',
                                         NULL);
             $this->_connection->addEventHandler($this->_rawHandler);
         }
@@ -63,7 +67,7 @@ extends ErebotModuleBase
             $this->_chans = array();
     }
 
-    public function handleSed(iErebotEventChan &$event)
+    public function handleSed(Erebot_Event_WithChanSourceTextAbstract &$event)
     {
         $chan = $event->getChan();
         if (!isset($this->_chans[$chan]))
@@ -106,7 +110,7 @@ extends ErebotModuleBase
         return FALSE;
     }
 
-    public function handleRawText(iErebotEvent &$event)
+    public function handleRawText(Erebot_Event_WithChanSourceTextAbstract &$event)
     {
         $this->_chans[$event->getChan()] = $event->getText();
     }
