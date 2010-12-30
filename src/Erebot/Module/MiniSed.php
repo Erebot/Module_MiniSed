@@ -48,16 +48,12 @@ extends Erebot_Module_Base
             );
             $matchAny   =   Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
 
-            $filter         = new Erebot_TextFilter($this->_mainCfg);
-            $filter->addPattern(
-                Erebot_TextFilter::TYPE_REGEXP,
-                self::REPLACE_PATTERN,
-                FALSE
-            );
             $this->_handler = new Erebot_EventHandler(
-                                    array($this, 'handleSed'),
-                                    'Erebot_Event_ChanText',
-                                    NULL, $filter);
+                array($this, 'handleSed'),
+                'Erebot_Event_ChanText',
+                NULL,
+                new Erebot_TextFilter_Regex(self::REPLACE_PATTERN, FALSE)
+            );
             $this->_connection->addEventHandler($this->_handler);
 
             $this->_rawHandler  = new Erebot_EventHandler(
