@@ -50,16 +50,17 @@ extends Erebot_Module_Base
 
             $this->_handler = new Erebot_EventHandler(
                 array($this, 'handleSed'),
-                'Erebot_Event_ChanText',
-                NULL,
-                new Erebot_TextFilter_Regex(self::REPLACE_PATTERN, FALSE)
+                new Erebot_Event_Match_All(
+                    new Erebot_Event_Match_InstanceOf('Erebot_Event_ChanText'),
+                    new Erebot_Event_Match_TextRegex(self::REPLACE_PATTERN)
+                )
             );
             $this->_connection->addEventHandler($this->_handler);
 
             $this->_rawHandler  = new Erebot_EventHandler(
-                                        array($this, 'handleRawText'),
-                                        'Erebot_Event_ChanText',
-                                        NULL);
+                array($this, 'handleRawText'),
+                new Erebot_Event_Match_InstanceOf('Erebot_Event_ChanText')
+            );
             $this->_connection->addEventHandler($this->_rawHandler);
         }
 
