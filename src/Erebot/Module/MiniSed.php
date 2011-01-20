@@ -33,20 +33,20 @@ extends Erebot_Module_Base
     public function reload($flags)
     {
         if (!($flags & self::RELOAD_INIT)) {
-            $registry   =&  $this->_connection->getModule(
+            $registry   = $this->_connection->getModule(
                 'Erebot_Module_TriggerRegistry'
             );
-            $matchAny   =   Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
+            $matchAny   = Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
 
             $this->_connection->removeEventHandler($this->_handler);
             $this->_connection->removeEventHandler($this->_rawHandler);
         }
 
         if ($flags & self::RELOAD_HANDLERS) {
-            $registry   =&  $this->_connection->getModule(
+            $registry   = $this->_connection->getModule(
                 'Erebot_Module_TriggerRegistry'
             );
-            $matchAny   =   Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
+            $matchAny   = Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
 
             $this->_handler = new Erebot_EventHandler(
                 array($this, 'handleSed'),
@@ -68,7 +68,7 @@ extends Erebot_Module_Base
             $this->_chans = array();
     }
 
-    public function handleSed(Erebot_Event_WithChanSourceTextAbstract &$event)
+    public function handleSed(Erebot_Event_WithChanSourceTextAbstract $event)
     {
         $chan = $event->getChan();
         if (!isset($this->_chans[$chan]))
@@ -112,7 +112,7 @@ extends Erebot_Module_Base
     }
 
     public function handleRawText(
-        Erebot_Event_WithChanSourceTextAbstract &$event
+        Erebot_Event_WithChanSourceTextAbstract $event
     )
     {
         $this->_chans[$event->getChan()] = $event->getText();
