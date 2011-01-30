@@ -30,7 +30,7 @@ extends Erebot_Module_Base
 
     const REPLACE_PATTERN = '@^[sS]([^\\\\a-zA-Z0-9])(.*\\1.*)\\1$@';
 
-    public function reload($flags)
+    public function _reload($flags)
     {
         if (!($flags & self::RELOAD_INIT)) {
             $registry   = $this->_connection->getModule(
@@ -66,6 +66,10 @@ extends Erebot_Module_Base
 
         if ($flags & self::RELOAD_MEMBERS)
             $this->_chans = array();
+    }
+
+    protected function _unload()
+    {
     }
 
     public function handleSed(Erebot_Event_WithChanSourceTextAbstract $event)
