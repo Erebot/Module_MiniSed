@@ -37,12 +37,12 @@ extends ErebotModuleTestCase
             ->method('getModule')
             ->will($this->returnValue($this));
 
-        $this->_module = new Erebot_Module_MiniSed(
+        $this->_module = new Erebot_Module_MiniSed('#test');
+        $this->_module->reload(
             $this->_connection,
-            '#test'
+            Erebot_Module_Base::RELOAD_ALL |
+            Erebot_Module_Base::RELOAD_INIT
         );
-        $this->_module->reload( Erebot_Module_Base::RELOAD_ALL |
-                                Erebot_Module_Base::RELOAD_INIT);
     }
 
     public function tearDown()
