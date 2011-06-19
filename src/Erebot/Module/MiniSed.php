@@ -16,20 +16,31 @@
     along with Erebot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * \brief
+ *      A module that does simple search-and-replace substitutions
+ *      using a syntax similar to sed's "s/.../.../" command.
+ */
 class   Erebot_Module_MiniSed
 extends Erebot_Module_Base
 {
+    /// Metadata about this module.
     static protected $_metadata = array(
         'requires'  =>  array(
             'Erebot_Module_TriggerRegistry',
         ),
     );
+    /// Handler that is triggered when a substitution is requested.
     protected $_handler;
+    /// Handler that keeps track of the latest sentence said on each channel.
     protected $_rawHandler;
+    /// Associative array with the latest sentence on each IRC channel.
     protected $_chans;
 
+    /// Regex pattern to detect substitution commands.
     const REPLACE_PATTERN = '@^[sS]([^\\\\a-zA-Z0-9])(.*\\1.*)\\1$@';
 
+    /// \copydoc Erebot_Module_Base::_reload()
     public function _reload($flags)
     {
         if (!($flags & self::RELOAD_INIT)) {
@@ -68,10 +79,18 @@ extends Erebot_Module_Base
             $this->_chans = array();
     }
 
+    /// \copydoc Erebot_Module_Base::_unload()
     protected function _unload()
     {
     }
 
+    /**
+     * Performs text substitutions using a regex pattern,
+     * with that same syntax as sed's "s/.../.../" command.
+     *
+     * \param Erebot_Event_WithChanSourceTextAbstract $event
+     *      Substitution command.
+     */
     public function handleSed(Erebot_Event_WithChanSourceTextAbstract $event)
     {
         $chan = $event->getChan();
@@ -115,6 +134,13 @@ extends Erebot_Module_Base
         return FALSE;
     }
 
+    /**
+     * Records the last sentence said in a channel,
+     * for every channel the bot has joined.
+     *
+     * \param Erebot_Event_WithChanSourceTextAbstract $event
+     *      Some sentence that was sent to the channel.
+     */
     public function handleRawText(
         Erebot_Event_WithChanSourceTextAbstract $event
     )
