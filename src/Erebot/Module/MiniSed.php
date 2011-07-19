@@ -24,12 +24,6 @@
 class   Erebot_Module_MiniSed
 extends Erebot_Module_Base
 {
-    /// Metadata about this module.
-    static protected $_metadata = array(
-        'requires'  =>  array(
-            'Erebot_Module_TriggerRegistry',
-        ),
-    );
     /// Handler that is triggered when a substitution is requested.
     protected $_handler;
     /// Handler that keeps track of the latest sentence said on each channel.
