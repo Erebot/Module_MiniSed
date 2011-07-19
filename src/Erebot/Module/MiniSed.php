@@ -54,7 +54,7 @@ extends Erebot_Module_Base
             $matchAny   = Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
 
             $this->_handler = new Erebot_EventHandler(
-                array($this, 'handleSed'),
+                new Erebot_Callable(array($this, 'handleSed')),
                 new Erebot_Event_Match_All(
                     new Erebot_Event_Match_InstanceOf('Erebot_Event_ChanText'),
                     new Erebot_Event_Match_TextRegex(self::REPLACE_PATTERN)
@@ -63,7 +63,7 @@ extends Erebot_Module_Base
             $this->_connection->addEventHandler($this->_handler);
 
             $this->_rawHandler  = new Erebot_EventHandler(
-                array($this, 'handleRawText'),
+                new Erebot_Callable(array($this, 'handleRawText')),
                 new Erebot_Event_Match_InstanceOf('Erebot_Event_ChanText')
             );
             $this->_connection->addEventHandler($this->_rawHandler);
