@@ -85,7 +85,10 @@ extends Erebot_Module_Base
      * \param Erebot_Event_WithChanSourceTextAbstract $event
      *      Substitution command.
      */
-    public function handleSed(Erebot_Event_WithChanSourceTextAbstract $event)
+    public function handleSed(
+        Erebot_Interface_EventHandler           $handler,
+        Erebot_Event_WithChanSourceTextAbstract $event
+    )
     {
         $chan = $event->getChan();
         if (!isset($this->_chans[$chan]))
@@ -136,6 +139,7 @@ extends Erebot_Module_Base
      *      Some sentence that was sent to the channel.
      */
     public function handleRawText(
+        Erebot_Interface_EventHandler           $handler,
         Erebot_Event_WithChanSourceTextAbstract $event
     )
     {
