@@ -59,7 +59,7 @@ extends ErebotModuleTestCase
             'Tester',
             'Hello foo!'
         );
-        $this->_module->handleRawText($event);
+        $this->_module->handleRawText($this->_eventHandler, $event);
         $this->assertSame(0, count($this->_outputBuffer));
 
         // Substitute "foo" for "baz".
@@ -69,7 +69,7 @@ extends ErebotModuleTestCase
             'Tester',
             's/foo/baz/'
         );
-        $this->_module->handleSed($event);
+        $this->_module->handleSed($this->_eventHandler, $event);
         $this->assertSame(1, count($this->_outputBuffer));
         $this->assertSame(
             "PRIVMSG #test :Hello baz!",
@@ -84,7 +84,7 @@ extends ErebotModuleTestCase
             'Tester',
             's/z/r/'
         );
-        $this->_module->handleSed($event);
+        $this->_module->handleSed($this->_eventHandler, $event);
         // Substitute "z" for "r" (baz -> bar).
         // This test proves that you can chain replacements.
         $this->assertSame(1, count($this->_outputBuffer));
