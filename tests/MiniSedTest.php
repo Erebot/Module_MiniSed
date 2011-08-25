@@ -16,17 +16,37 @@
     along with Erebot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once(
-    dirname(__FILE__) .
-    DIRECTORY_SEPARATOR . 'testenv' .
-    DIRECTORY_SEPARATOR . 'bootstrap.php'
-);
+abstract class  EventStub
+extends         Erebot_Event_WithChanSourceTextAbstract
+{
+    public function __construct(
+        Erebot_Interface_Connection $connection,
+                                    $chan,
+                                    $source,
+                                    $text
+    )
+    {
+        $this->_connection  = $connection;
+        $this->_chan        = $chan;
+        $this->_source      = $source;
+        $this->_text        = $text;
+    }
+}
 
 class   MiniSedTest
 extends ErebotModuleTestCase
 {
     // Mock TriggerRegistry.
     const MATCH_ANY = '*';
+
+    public function _getMock($text)
+    {
+        return $this->getMockForAbstractClass(
+            'EventStub',
+            array($this->_connection, '#test', 'Tester', $text),
+            '', TRUE, FALSE
+        );
+    }
 
     public function setUp()
     {
@@ -38,11 +58,7 @@ extends ErebotModuleTestCase
             ->will($this->returnValue($this));
 
         $this->_module = new Erebot_Module_MiniSed('#test');
-        $this->_module->reload(
-            $this->_connection,
-            Erebot_Module_Base::RELOAD_ALL |
-            Erebot_Module_Base::RELOAD_INIT
-        );
+        $this->_module->reload($this->_connection, 0);
     }
 
     public function tearDown()
@@ -53,22 +69,12 @@ extends ErebotModuleTestCase
 
     public function testMiniSed()
     {
-        $event = new Erebot_Event_ChanText(
-            $this->_connection,
-            '#test',
-            'Tester',
-            'Hello foo!'
-        );
+        $event = $this->_getMock('Hello foo!');
         $this->_module->handleRawText($this->_eventHandler, $event);
         $this->assertSame(0, count($this->_outputBuffer));
 
         // Substitute "foo" for "baz".
-        $event = new Erebot_Event_ChanText(
-            $this->_connection,
-            '#test',
-            'Tester',
-            's/foo/baz/'
-        );
+        $event = $this->_getMock('s/foo/baz/');
         $this->_module->handleSed($this->_eventHandler, $event);
         $this->assertSame(1, count($this->_outputBuffer));
         $this->assertSame(
@@ -78,12 +84,7 @@ extends ErebotModuleTestCase
 
         // Clear the output buffer.
         $this->_outputBuffer = array();
-        $event = new Erebot_Event_ChanText(
-            $this->_connection,
-            '#test',
-            'Tester',
-            's/z/r/'
-        );
+        $event = $this->_getMock('s/z/r/');
         $this->_module->handleSed($this->_eventHandler, $event);
         // Substitute "z" for "r" (baz -> bar).
         // This test proves that you can chain replacements.
