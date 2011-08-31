@@ -113,8 +113,8 @@ extends Erebot_Module_Base
                 $base = $pos + 2;
         }
 
-        $nb_parts   = count($parts);
-        if ($nb_parts < 2 || $nb_parts > 3)
+        $nbParts   = count($parts);
+        if ($nbParts < 2 || $nbParts > 3)
             return; // Silently ignore invalid patterns
 
         if (!preg_match('/[a-zA-Z0-9]/', $parts[0]))
