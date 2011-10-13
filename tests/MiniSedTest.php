@@ -16,7 +16,7 @@
     along with Erebot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-abstract class  EventStub
+class  EventStub
 extends         Erebot_Event_WithChanSourceTextAbstract
 {
     public function __construct(
@@ -41,11 +41,7 @@ extends ErebotModuleTestCase
 
     public function _getMock($text)
     {
-        return $this->getMockForAbstractClass(
-            'EventStub',
-            array($this->_connection, '#test', 'Tester', $text),
-            '', TRUE, FALSE
-        );
+        return new EventStub($this->_connection, "#test", "Tester", $text);
     }
 
     public function setUp()
