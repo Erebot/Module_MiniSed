@@ -16,8 +16,8 @@
     along with Erebot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-class  EventStub
-extends         Erebot_Event_WithChanSourceTextAbstract
+class   EventStub
+extends Erebot_Event_WithChanSourceTextAbstract
 {
     public function __construct(
         Erebot_Interface_Connection $connection,
@@ -34,7 +34,7 @@ extends         Erebot_Event_WithChanSourceTextAbstract
 }
 
 class   MiniSedTest
-extends ErebotModuleTestCase
+extends Erebot_Testenv_Module_TestCase
 {
     // Mock TriggerRegistry.
     const MATCH_ANY = '*';
@@ -46,14 +46,16 @@ extends ErebotModuleTestCase
 
     public function setUp()
     {
+        $this->_module = new Erebot_Module_MiniSed('#test');
         parent::setUp();
 
+        // So that the lookup for TriggerRegistry
+        // actually returns this instance instead.
         $this->_connection
             ->expects($this->any())
             ->method('getModule')
             ->will($this->returnValue($this));
 
-        $this->_module = new Erebot_Module_MiniSed('#test');
         $this->_module->reload($this->_connection, 0);
     }
 
