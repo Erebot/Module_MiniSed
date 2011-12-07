@@ -34,7 +34,18 @@ extends Erebot_Module_Base
     /// Regex pattern to detect substitution commands.
     const REPLACE_PATTERN = '@^[sS]([^\\\\a-zA-Z0-9])(.*\\1.*)\\1$@';
 
-    /// \copydoc Erebot_Module_Base::_reload()
+    /**
+     * This method is called whenever the module is (re)loaded.
+     *
+     * \param int $flags
+     *      A bitwise OR of the Erebot_Module_Base::RELOAD_*
+     *      constants. Your method should take proper actions
+     *      depending on the value of those flags.
+     *
+     * \note
+     *      See the documentation on individual RELOAD_*
+     *      constants for a list of possible values.
+     */
     public function _reload($flags)
     {
         if (!($flags & self::RELOAD_INIT)) {
@@ -82,8 +93,13 @@ extends Erebot_Module_Base
      * Performs text substitutions using a regex pattern,
      * with that same syntax as sed's "s/.../.../" command.
      *
+     * \param Erebot_Interface_EventHandler $handler
+     *      Handler that triggered this event.
+     *
      * \param Erebot_Event_WithChanSourceTextAbstract $event
      *      Substitution command.
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function handleSed(
         Erebot_Interface_EventHandler           $handler,
@@ -135,8 +151,13 @@ extends Erebot_Module_Base
      * Records the last sentence said in a channel,
      * for every channel the bot has joined.
      *
+     * \param Erebot_Interface_EventHandler $handler
+     *      Handler that triggered this event.
+     *
      * \param Erebot_Event_WithChanSourceTextAbstract $event
      *      Some sentence that was sent to the channel.
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function handleRawText(
         Erebot_Interface_EventHandler           $handler,
