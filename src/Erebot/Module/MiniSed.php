@@ -130,11 +130,9 @@ extends Erebot_Module_Base
         }
 
         $nbParts   = count($parts);
-        if ($nbParts < 2 || $nbParts > 3)
+        if ($nbParts < 2 || $nbParts > 3 ||
+            !preg_match('/[a-zA-Z0-9]/', $parts[0]))
             return; // Silently ignore invalid patterns
-
-        if (!preg_match('/[a-zA-Z0-9]/', $parts[0]))
-            return;
 
         $pattern    = '@'.str_replace('@', '\\@', $parts[0]).'@'.
                         (isset($parts[2]) ? $parts[2] : '');
@@ -143,7 +141,6 @@ extends Erebot_Module_Base
         $replaced   = preg_replace($pattern, $subject, $previous);
         $this->_chans[$chan] = $replaced;
         $this->sendMessage($chan, $replaced);
-
         return FALSE;
     }
 
