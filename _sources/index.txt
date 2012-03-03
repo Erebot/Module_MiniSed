@@ -17,9 +17,9 @@ Contents:
 
 Current status on http://travis-ci.org/:
 
-..  image:: https://secure.travis-ci.org/fpoirotte/Erebot_Module_MiniSed.png
+..  image:: https://secure.travis-ci.org/Erebot/Erebot_Module_MiniSed.png
     :alt: unknown
-    :target: http://travis-ci.org/#!/fpoirotte/Erebot_Module_MiniSed/
+    :target: http://travis-ci.org/#!/Erebot/Erebot_Module_MiniSed/
 
 
 ..  _`Erebot`:
