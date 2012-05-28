@@ -78,6 +78,9 @@ extends Erebot_Module_Base
                 new Erebot_Event_Match_InstanceOf('Erebot_Event_ChanText')
             );
             $this->_connection->addEventHandler($this->_rawHandler);
+
+            $cls = $this->getFactory('!Callable');
+            $this->registerHelpMethod(new $cls(array($this, 'getHelp')));
         }
 
         if ($flags & self::RELOAD_MEMBERS)
@@ -87,6 +90,45 @@ extends Erebot_Module_Base
     /// \copydoc Erebot_Module_Base::_unload()
     protected function _unload()
     {
+    }
+
+    /**
+     * Provides help about this module.
+     *
+     * \param Erebot_Interface_Event_Base_TextMessage $event
+     *      Some help request.
+     *
+     * \param Erebot_Interface_TextWrapper $words
+     *      Parameters passed with the request. This is the same
+     *      as this module's name when help is requested on the
+     *      module itself (in opposition with help on a specific
+     *      command provided by the module).
+     */
+    public function getHelp(
+        Erebot_Interface_Event_Base_TextMessage $event,
+        Erebot_Interface_TextWrapper            $words
+    )
+    {
+        if ($event instanceof Erebot_Interface_Event_Base_Private) {
+            $target = $event->getSource();
+            $chan   = NULL;
+        }
+        else
+            $target = $chan = $event->getChan();
+
+        $fmt        = $this->getFormatter($chan);
+        $moduleName = strtolower(get_class());
+        $nbArgs     = count($words);
+
+        if ($nbArgs == 1 && $words[0] == $moduleName) {
+            $msg = $fmt->_(
+                "This module can be used in a channel to substitude some ".
+                "text in the line immediately before using sed's syntax: ".
+                "s/regexp/replacement/"
+            );
+            $this->sendMessage($target, $msg);
+            return TRUE;
+        }
     }
 
     /**
