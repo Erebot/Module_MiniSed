@@ -1,5 +1,5 @@
 {
-    "name": "erebot/erebot-module-minised",
+    "name": "erebot/minised-module",
     "description": "Erebot module that provides a simplified version of sed's substitution command",
     "keywords": ["Erebot", "IRC", "bot", "module"],
     "homepage": "https://github.com/Erebot/Erebot_Module_MiniSed",
