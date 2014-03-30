@@ -1,6 +1,6 @@
 <phpunit forceCoversAnnotation="true" bootstrap="tests/bootstrap.php">
   <testsuites>
-    <testsuite name="Erebot/Module/AutoConnect">
+    <testsuite name="Erebot/Module/MiniSed">
       <directory>tests/</directory>
     </testsuite>
   </testsuites>
