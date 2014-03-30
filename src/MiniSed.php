@@ -16,20 +16,21 @@
     along with Erebot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+namespace Erebot\Module;
+
 /**
  * \brief
  *      A module that does simple search-and-replace substitutions
  *      using a syntax similar to sed's "s/.../.../" command.
  */
-class   Erebot_Module_MiniSed
-extends Erebot_Module_Base
+class MiniSed extends \Erebot\Module\Base implements \Erebot\Interfaces\HelpEnabled
 {
     /// Handler that is triggered when a substitution is requested.
-    protected $_handler;
+    protected $handler;
     /// Handler that keeps track of the latest sentence said on each channel.
-    protected $_rawHandler;
+    protected $rawHandler;
     /// Associative array with the latest sentence on each IRC channel.
-    protected $_chans;
+    protected $chans;
 
     /// Regex pattern to detect substitution commands.
     const REPLACE_PATTERN = '@^[sS]([^\\\\a-zA-Z0-9])(.*\\1.*)\\1$@';
@@ -38,7 +39,7 @@ extends Erebot_Module_Base
      * This method is called whenever the module is (re)loaded.
      *
      * \param int $flags
-     *      A bitwise OR of the Erebot_Module_Base::RELOAD_*
+     *      A bitwise OR of the Erebot::Module::Base::RELOAD_*
      *      constants. Your method should take proper actions
      *      depending on the value of those flags.
      *
@@ -46,88 +47,66 @@ extends Erebot_Module_Base
      *      See the documentation on individual RELOAD_*
      *      constants for a list of possible values.
      */
-    public function _reload($flags)
+    public function reload($flags)
     {
         if (!($flags & self::RELOAD_INIT)) {
-            $registry   = $this->_connection->getModule(
-                'Erebot_Module_TriggerRegistry'
-            );
-            $matchAny   = Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
-
-            $this->_connection->removeEventHandler($this->_handler);
-            $this->_connection->removeEventHandler($this->_rawHandler);
+            $this->connection->removeEventHandler($this->handler);
+            $this->connection->removeEventHandler($this->rawHandler);
         }
 
         if ($flags & self::RELOAD_HANDLERS) {
-            $registry   = $this->_connection->getModule(
-                'Erebot_Module_TriggerRegistry'
-            );
-            $matchAny   = Erebot_Utils::getVStatic($registry, 'MATCH_ANY');
-
-            $this->_handler = new Erebot_EventHandler(
-                new Erebot_Callable(array($this, 'handleSed')),
-                new Erebot_Event_Match_All(
-                    new Erebot_Event_Match_InstanceOf('Erebot_Event_ChanText'),
-                    new Erebot_Event_Match_TextRegex(self::REPLACE_PATTERN)
+            $this->handler = new \Erebot\EventHandler(
+                \Erebot\CallableWrapper::wrap(array($this, 'handleSed')),
+                new \Erebot\Event\Match\All(
+                    new \Erebot\Event\Match\Type('\\Erebot\\Event\\ChanText'),
+                    new \Erebot\Event\Match\TextRegex(self::REPLACE_PATTERN)
                 )
             );
-            $this->_connection->addEventHandler($this->_handler);
+            $this->connection->addEventHandler($this->handler);
 
-            $this->_rawHandler  = new Erebot_EventHandler(
-                new Erebot_Callable(array($this, 'handleRawText')),
-                new Erebot_Event_Match_InstanceOf('Erebot_Event_ChanText')
+            $this->rawHandler  = new \Erebot\EventHandler(
+                \Erebot\CallableWrapper::wrap(array($this, 'handleRawText')),
+                new \Erebot\Event\Match\Type('\\Erebot\\Event\\ChanText')
             );
-            $this->_connection->addEventHandler($this->_rawHandler);
-
-            $cls = $this->getFactory('!Callable');
-            $this->registerHelpMethod(new $cls(array($this, 'getHelp')));
+            $this->connection->addEventHandler($this->rawHandler);
         }
 
-        if ($flags & self::RELOAD_MEMBERS)
-            $this->_chans = array();
-    }
-
-    /// \copydoc Erebot_Module_Base::_unload()
-    protected function _unload()
-    {
+        if ($flags & self::RELOAD_MEMBERS) {
+            $this->chans = array();
+        }
     }
 
     /**
      * Provides help about this module.
      *
-     * \param Erebot_Interface_Event_Base_TextMessage $event
+     * \param Erebot::Interfaces::Event::Base::TextMessage $event
      *      Some help request.
      *
-     * \param Erebot_Interface_TextWrapper $words
+     * \param Erebot::Interfaces::TextWrapper $words
      *      Parameters passed with the request. This is the same
      *      as this module's name when help is requested on the
      *      module itself (in opposition with help on a specific
      *      command provided by the module).
      */
     public function getHelp(
-        Erebot_Interface_Event_Base_TextMessage $event,
-        Erebot_Interface_TextWrapper            $words
-    )
-    {
-        if ($event instanceof Erebot_Interface_Event_Base_Private) {
+        \Erebot\Interfaces\Event\Base\TextMessage   $event,
+        \Erebot\Interfaces\TextWrapper              $words
+    ) {
+        if ($event instanceof \Erebot\Interfaces\Event\Base\PrivateMessage) {
             $target = $event->getSource();
-            $chan   = NULL;
-        }
-        else
+            $chan   = null;
+        } else {
             $target = $chan = $event->getChan();
+        }
 
-        $fmt        = $this->getFormatter($chan);
-        $moduleName = strtolower(get_class());
-        $nbArgs     = count($words);
-
-        if ($nbArgs == 1 && $words[0] == $moduleName) {
-            $msg = $fmt->_(
+        if (count($words) == 1 && $words[0] === get_called_class()) {
+            $msg = $this->getFormatter($chan)->_(
                 "This module can be used in a channel to substitude some ".
                 "text in the line immediately before using sed's syntax: ".
                 "s/regexp/replacement/"
             );
             $this->sendMessage($target, $msg);
-            return TRUE;
+            return true;
         }
     }
 
@@ -135,24 +114,24 @@ extends Erebot_Module_Base
      * Performs text substitutions using a regex pattern,
      * with that same syntax as sed's "s/.../.../" command.
      *
-     * \param Erebot_Interface_EventHandler $handler
+     * \param Erebot::Interfaces::EventHandler $handler
      *      Handler that triggered this event.
      *
-     * \param Erebot_Event_WithChanSourceTextAbstract $event
+     * \param Erebot::Event::WithChanSourceTextAbstract $event
      *      Substitution command.
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function handleSed(
-        Erebot_Interface_EventHandler           $handler,
-        Erebot_Event_WithChanSourceTextAbstract $event
-    )
-    {
+        \Erebot\Interfaces\EventHandler             $handler,
+        \Erebot\Event\WithChanSourceTextAbstract    $event
+    ) {
         $chan = $event->getChan();
-        if (!isset($this->_chans[$chan]))
+        if (!isset($this->chans[$chan])) {
             return;
+        }
 
-        $previous = $this->_chans[$chan];
+        $previous = $this->chans[$chan];
         preg_match(self::REPLACE_PATTERN, $event->getText(), $matches);
 
         $parts  = array();
@@ -165,45 +144,43 @@ extends Erebot_Module_Base
                 $parts[]    = substr($text, 0, $pos);
                 $text       = substr($text, $pos + 1);
                 $base       = 0;
-            }
-
-            else
+            } else {
                 $base = $pos + 2;
+            }
         }
 
         $nbParts   = count($parts);
-        if ($nbParts < 2 || $nbParts > 3 ||
-            !preg_match('/[a-zA-Z0-9]/', $parts[0]))
-            return; // Silently ignore invalid patterns
+        if ($nbParts < 2 || $nbParts > 3 || !preg_match('/[a-zA-Z0-9]/', $parts[0])) {
+            // Silently ignore invalid patterns
+            return;
+        }
 
         $pattern    = '@'.str_replace('@', '\\@', $parts[0]).'@'.
                         (isset($parts[2]) ? $parts[2] : '');
         $subject    = $parts[1];
 
         $replaced   = preg_replace($pattern, $subject, $previous);
-        $this->_chans[$chan] = $replaced;
+        $this->chans[$chan] = $replaced;
         $this->sendMessage($chan, $replaced);
-        return FALSE;
+        return false;
     }
 
     /**
      * Records the last sentence said in a channel,
      * for every channel the bot has joined.
      *
-     * \param Erebot_Interface_EventHandler $handler
+     * \param Erebot::Interfaces::EventHandler $handler
      *      Handler that triggered this event.
      *
-     * \param Erebot_Event_WithChanSourceTextAbstract $event
+     * \param Erebot::Event::WithChanSourceTextAbstract $event
      *      Some sentence that was sent to the channel.
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function handleRawText(
-        Erebot_Interface_EventHandler           $handler,
-        Erebot_Event_WithChanSourceTextAbstract $event
-    )
-    {
-        $this->_chans[$event->getChan()] = $event->getText();
+        \Erebot\Interfaces\EventHandler             $handler,
+        \Erebot\Event\WithChanSourceTextAbstract    $event
+    ) {
+        $this->chans[$event->getChan()] = $event->getText();
     }
 }
-

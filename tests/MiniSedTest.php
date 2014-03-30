@@ -17,19 +17,19 @@
 */
 
 class   EventStub
-extends Erebot_Event_WithChanSourceTextAbstract
+extends \Erebot\Event\WithChanSourceTextAbstract
 {
     public function __construct(
-        Erebot_Interface_Connection $connection,
-                                    $chan,
-                                    $source,
-                                    $text
+        \Erebot\Interfaces\Connection   $connection,
+                                        $chan,
+                                        $source,
+                                        $text
     )
     {
-        $this->_connection  = $connection;
-        $this->_chan        = $chan;
-        $this->_source      = $source;
-        $this->_text        = $text;
+        $this->connection  = $connection;
+        $this->chan        = $chan;
+        $this->source      = $source;
+        $this->text        = $text;
     }
 }
 
@@ -46,7 +46,7 @@ extends Erebot_Testenv_Module_TestCase
 
     public function setUp()
     {
-        $this->_module = new Erebot_Module_MiniSed('#test');
+        $this->_module = new \Erebot\Module\MiniSed('#test');
         parent::setUp();
 
         // So that the lookup for TriggerRegistry
@@ -56,12 +56,12 @@ extends Erebot_Testenv_Module_TestCase
             ->method('getModule')
             ->will($this->returnValue($this));
 
-        $this->_module->reload($this->_connection, 0);
+        $this->_module->reloadModule($this->_connection, 0);
     }
 
     public function tearDown()
     {
-        $this->_module->unload();
+        $this->_module->unloadModule();
         parent::tearDown();
     }
 
