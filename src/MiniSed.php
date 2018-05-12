@@ -56,7 +56,7 @@ class MiniSed extends \Erebot\Module\Base implements \Erebot\Interfaces\HelpEnab
 
         if ($flags & self::RELOAD_HANDLERS) {
             $this->handler = new \Erebot\EventHandler(
-                \Erebot\CallableWrapper::wrap(array($this, 'handleSed')),
+                array($this, 'handleSed'),
                 new \Erebot\Event\Match\All(
                     new \Erebot\Event\Match\Type('\\Erebot\\Event\\ChanText'),
                     new \Erebot\Event\Match\TextRegex(self::REPLACE_PATTERN)
@@ -65,7 +65,7 @@ class MiniSed extends \Erebot\Module\Base implements \Erebot\Interfaces\HelpEnab
             $this->connection->addEventHandler($this->handler);
 
             $this->rawHandler  = new \Erebot\EventHandler(
-                \Erebot\CallableWrapper::wrap(array($this, 'handleRawText')),
+                array($this, 'handleRawText'),
                 new \Erebot\Event\Match\Type('\\Erebot\\Event\\ChanText')
             );
             $this->connection->addEventHandler($this->rawHandler);
